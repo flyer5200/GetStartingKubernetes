@@ -7,6 +7,7 @@ MINION_ADDRESS=0.0.0.0
 MINION_PORT=10250
 MINION_HOSTNAME=10.0.0.118
 KUBE_ALLOW_PRIV=false
+BASE_DOCKER_CONTAINER=docker.io/centos:latest
 
 cat <<EOF >/usr/lib/systemd/system/kubelet.service
 [Unit]
@@ -22,7 +23,8 @@ ExecStart=/opt/kubernetes/server/bin/kubelet \\
     --address=${MINION_ADDRESS} \\
     --port=${MINION_PORT} \\
     --hostname_override=${MINION_HOSTNAME} \\
-    --allow_privileged=${KUBE_ALLOW_PRIV}
+    --pod-infra-container-image=${BASE_DOCKER_CONTAINER} \\
+    --allow_privileged=${KUBE_ALLOW_PRIV} \\
 Restart=on-failure
 
 [Install]
