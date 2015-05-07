@@ -1,5 +1,5 @@
 # GetStartingKubernetes
-####Kubernetes学习研究集结
+####Kubernetes学习研究集
 
 Kubernetes 版本 0.16.2
 
