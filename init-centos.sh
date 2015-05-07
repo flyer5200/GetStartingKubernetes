@@ -1,3 +1,5 @@
+#!/bin/sh
+
 yum -y install wget
 
 mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
@@ -11,4 +13,6 @@ yum makecache
 yum -y install lrzsz
 yum -y install net-tools
 
-hostnamectl set-hostname "minion1"
+hostnamectl set-hostname "centos7"
+
+sh replace-firewall.sh
