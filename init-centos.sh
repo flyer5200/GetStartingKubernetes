@@ -13,8 +13,9 @@ yum makecache
 yum -y install lrzsz
 yum -y install net-tools
 
-hostnamectl set-hostname "minion1"
+hostnamectl set-hostname "centos7"
 
+sh replace-firewall.sh
 
 #update kernel to latest stable kernel
 
@@ -31,3 +32,4 @@ yum --enablerepo=elrepo-kernel install  kernel-ml-devel kernel-ml -y
 grub2-set-default 0
 
 reboot
+
