@@ -32,7 +32,7 @@ yum makecache
 
 yum -y install lrzsz
 yum -y install net-tools
-
+yum -y install git
 
 # set hostname
 
