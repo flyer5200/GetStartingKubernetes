@@ -14,6 +14,7 @@ KUBE_ALLOW_PRIV=false
 KUBE_BIND_ADDRESS=0.0.0.0
 
 install_docker(){
+	echo "starting install docker..."
 	yum -y install docker
 	sudo sed -i 's|OPTIONS=|OPTIONS=--registry-mirror=http://95728259.m.daocloud.io |g' /etc/sysconfig/docker
 	
@@ -21,9 +22,11 @@ install_docker(){
 	systemctl daemon-reload	
 	systemctl start docker
 	systemctl enable docker
+	echo "docker install successfull!"
 }
 
 download_archives(){
+	echo "starting download kubernetes..."
 	! test -d /opt/kubernetes* && rm -rf /opt/kubernetes*
 	wget ${BASE_DOWNLOAD_SERVER}/cloud_repository/kubernetes/server/kubernetes-server-linux-amd64.tar.gz -O /opt/kubernetes-server-linux-amd64.tar.gz
 
@@ -33,10 +36,13 @@ download_archives(){
 
 	cd ../
 	rm -rf /opt/kubernetes-server-linux-amd64.tar.gz
+
+	echo "kubernetes download successfull!"
 }
 
 
 install_kubelet(){
+	echo "starting install kubelet..."
 	cat <<-EOF>/usr/lib/systemd/system/kubelet.service
 	[Unit]
 	Description=Kubernetes Kubelet
@@ -62,9 +68,12 @@ install_kubelet(){
 	systemctl stop kubelet
 	systemctl enable kubelet
 	systemctl start kubelet	
+
+	echo "kubelet install successfull!"
 }
 
 install_kubeletProxy(){
+	echo "starting install kubeletProxy..."
 	cat <<-EOF>/usr/lib/systemd/system/kubelet-proxy.service
 	[Unit]
 	Description=Kubernetes Proxy
@@ -88,13 +97,17 @@ install_kubeletProxy(){
 	systemctl stop kubelet-proxy
 	systemctl enable kubelet-proxy
 	systemctl start kubelet-proxy
+
+	echo "kubeletProxy install successfull!"
 }
 
 applyIptablesRules(){
-	iptables -I INPUT -p tcp --dport 10250 -j ACCEPT
-	iptables -I OUTPUT -p tcp --dport 10250 -j ACCEPT
+	iptables -I INPUT -p tcp --dport ${MINION_PORT} -j ACCEPT
+	iptables -I OUTPUT -p tcp --dport ${MINION_PORT} -j ACCEPT
 	iptables-save > /etc/sysconfig/iptables	
 	systemctl restart iptables
+
+	echo "Apply iptables rules successfull!"
 }
 
 install_docker

@@ -71,6 +71,8 @@ install_Etcd(){
 	systemctl stop etcd
 	systemctl start etcd
 	systemctl enable etcd
+
+	echo "Etcd install successfull!"
 }
 
 install_KubeApiserver(){
@@ -102,6 +104,8 @@ install_KubeApiserver(){
 	systemctl stop kube-apiserver
 	systemctl start kube-apiserver
 	systemctl enable kube-apiserver
+
+	echo "KubeApiserver install successfull!"
 }
 
 
@@ -129,6 +133,8 @@ install_KubeControllerManager(){
 	systemctl stop kube-controller-manager
 	systemctl start kube-controller-manager
 	systemctl enable kube-controller-manager
+
+	echo "KubeControllerManager install successfull!"
 }
 
 
@@ -155,17 +161,21 @@ install_KubeScheduler(){
 	systemctl stop kube-scheduler
 	systemctl start kube-scheduler
 	systemctl enable kube-scheduler
+
+	echo "KubeScheduler install successfull!"
 }
 
 applyIptablesRules(){
-	iptables -I INPUT -p tcp --dport 8080 -j ACCEPT
-	iptables -I OUTPUT -p tcp --dport 8080 -j ACCEPT
+	iptables -I INPUT -p tcp --dport ${KUBE_API_PORT} -j ACCEPT
+	iptables -I OUTPUT -p tcp --dport ${KUBE_API_PORT} -j ACCEPT
 	iptables -I INPUT -p tcp --dport 4001 -j ACCEPT
 	iptables -I OUTPUT -p tcp --dport 4001 -j ACCEPT
 	iptables -I INPUT -p tcp --dport 7001 -j ACCEPT
 	iptables -I OUTPUT -p tcp --dport 7001 -j ACCEPT
 	iptables-save > /etc/sysconfig/iptables	
 	systemctl restart iptables
+
+	echo "Apply iptables rules successfull!"
 }
 
 downloadkubernetes
