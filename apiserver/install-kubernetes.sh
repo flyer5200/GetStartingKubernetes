@@ -14,7 +14,7 @@ ETCD_NAME=kubernetes
 #apiserver config
 KUBE_ETCD_SERVERS=http://${ETCD_ADDR}			#important!!!  you must set etcd server address
 KUBE_API_ADDRESS=${MY_IP}
-KUBE_API_PORT=8388
+KUBE_API_PORT=8080
 MINION_PORT=10250
 KUBE_ALLOW_PRIV=false
 KUBE_SERVICE_ADDRESSES=10.10.10.0/24
