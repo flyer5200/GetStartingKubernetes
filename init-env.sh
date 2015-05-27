@@ -41,27 +41,32 @@ replaceFirewall(){
 	yum -y install iptables-services
 
 	systemctl start iptables
-	systemctl enable iptables
+	#systemctl enable iptables
 
-	# iptables -F
-	# iptables -X
-	# iptables -P INPUT DROP
-	# iptables -P OUTPUT DROP
-	# iptables -P FORWARD DROP
+	iptables -F
+	iptables -X
+	iptables -P INPUT DROP
+	iptables -P OUTPUT DROP
+	iptables -P FORWARD DROP
 	 
-	# # Accept port 80
-	# iptables -I INPUT -m tcp -p tcp --dport 80 -j ACCEPT
-	# iptables -I OUTPUT -m tcp -p tcp --sport 80 -j ACCEPT
+	# Accept port 80
+	iptables -I INPUT -m tcp -p tcp --dport 80 -j ACCEPT
+	iptables -I OUTPUT -m tcp -p tcp --sport 80 -j ACCEPT
 	 
-	# # Accept port 22
-	# iptables -I INPUT -m tcp -p tcp --dport 22 -j ACCEPT
-	# iptables -I OUTPUT -m tcp -p tcp --sport 22 -j ACCEPT
+	# Accept port 22
+	iptables -I INPUT -m tcp -p tcp --dport 22 -j ACCEPT
+	iptables -I OUTPUT -m tcp -p tcp --sport 22 -j ACCEPT
 
-	# # Allow full outgoing connection but no incomming stuff
-	# iptables -I OUTPUT -o eth0 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-	# iptables -I INPUT -i eth0 -m state --state ESTABLISHED,RELATED -j ACCEPT
+	# Allow full outgoing connection but no incomming stuff
+	iptables -I OUTPUT -o eth0 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+	iptables -I INPUT -i eth0 -m state --state ESTABLISHED,RELATED -j ACCEPT
 
-	# iptables-save > /etc/sysconfig/iptables
+	
+	iptables -I OUTPUT -o eth1 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+	iptables -I INPUT -i eth1 -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+	iptables-save > /etc/sysconfig/iptables
+	systemctl restart iptables
 }
 
 
@@ -83,8 +88,6 @@ updateKernel(){
 }
 
 yum -y install wget
-
-setHostname
 
 replaceRepo
 

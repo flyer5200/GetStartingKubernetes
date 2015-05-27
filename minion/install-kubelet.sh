@@ -15,6 +15,9 @@ KUBE_BIND_ADDRESS=0.0.0.0
 
 install_docker(){
 	echo "starting install docker..."
+	#delete aliyun ecs default route config
+	sed -i "s/172.16.0.0\/12 via 10.116.15.247 dev eth0//g" /etc/sysconfig/network-scripts/route-eth0
+
 	yum -y install docker
 	sudo sed -i 's|OPTIONS=|OPTIONS=--registry-mirror=http://95728259.m.daocloud.io |g' /etc/sysconfig/docker
 	
