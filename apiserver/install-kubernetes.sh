@@ -45,7 +45,7 @@ install_Etcd(){
 	echo "start install Etcd..."
 	! test -f /usr/bin/etcd && wget ${BASE_DOWNLOAD_SERVER}/cloud_repository/etcd -O /usr/bin/etcd 
 
-	! test -f /usr/bin/etcdctl && wget ${BASE_DOWNLOAD_SERVER}/cloud_repository/etcd -O /usr/bin/etcdctl
+	! test -f /usr/bin/etcdctl && wget ${BASE_DOWNLOAD_SERVER}/cloud_repository/etcdctl -O /usr/bin/etcdctl
 
 	chmod 755 /usr/bin/etcd*
 
@@ -166,6 +166,7 @@ install_KubeScheduler(){
 }
 
 applyIptablesRules(){
+	systemctl start iptables
 	iptables -I INPUT -p tcp --dport ${KUBE_API_PORT} -j ACCEPT
 	iptables -I OUTPUT -p tcp --dport ${KUBE_API_PORT} -j ACCEPT
 	iptables -I INPUT -p tcp --dport 4001 -j ACCEPT

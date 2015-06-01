@@ -4,7 +4,7 @@
 systemctl stop kubelet
 systemctl stop kubelet-proxy
 
-systemctl disable kubelet-proxy
+systemctl disable kubelet
 systemctl disable kubelet-proxy
 
 rm -rf /usr/lib/systemd/system/kubelet.service

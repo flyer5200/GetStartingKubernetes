@@ -49,7 +49,7 @@ install_kubelet(){
 	cat <<-EOF>/usr/lib/systemd/system/kubelet.service
 	[Unit]
 	Description=Kubernetes Kubelet
-	After=docker.service cadvisor.service
+	After=docker.service
 	Requires=docker.service
 
 	[Service]
@@ -59,8 +59,8 @@ install_kubelet(){
 	    --api-servers=${KUBE_API_SERVERS} \\
 	    --address=${KUBE_BIND_ADDRESS} \\
 	    --port=${MINION_PORT} \\
-	    --hostname_override=${MINION_HOSTNAME} \\
-	    --allow_privileged=${KUBE_ALLOW_PRIV} \\
+	    --hostname_override=${MY_IP} \\
+	    --allow_privileged=${KUBE_ALLOW_PRIV}
 	Restart=on-failure
 
 	[Install]
@@ -105,6 +105,7 @@ install_kubeletProxy(){
 }
 
 applyIptablesRules(){
+	systemctl start iptables
 	iptables -I INPUT -p tcp --dport ${MINION_PORT} -j ACCEPT
 	iptables -I OUTPUT -p tcp --dport ${MINION_PORT} -j ACCEPT
 	iptables-save > /etc/sysconfig/iptables	
