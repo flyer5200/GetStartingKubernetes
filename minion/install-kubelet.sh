@@ -1,26 +1,24 @@
 #!/bin/sh
 
-BASE_DOWNLOAD_SERVER=http://10.0.0.213				#important!!!  you must set the kubernetes archives download url
+BASE_DOWNLOAD_SERVER=http://download.linux-dream.net				#important!!!  you must set the kubernetes archives download url
+KUBE_API_SERVERS=192.168.1.2:8080						#important!!!  you must set the kubernetes apiserver
 
-MY_IP=$(hostname -I | awk '{print $1}')
 
 KUBE_LOGTOSTDERR=true
 KUBE_LOG_LEVEL=4
-KUBE_API_SERVERS=10.0.0.120:8080
 MINION_PORT=10250
-MINION_HOSTNAME=$(hostname)
-
 KUBE_ALLOW_PRIV=false
 KUBE_BIND_ADDRESS=0.0.0.0
+MY_IP=$(hostname -I | awk '{print $1}')
 
 install_docker(){
 	echo "starting install docker..."
 	#delete aliyun ecs default route config
-	sed -i "s/172.16.0.0\/12 via 10.116.15.247 dev eth0//g" /etc/sysconfig/network-scripts/route-eth0
+	sed -i "/^172.16.0.0/d" /etc/sysconfig/network-scripts/route-eth0
+	route del -net 172.16.0.0 netmask 255.240.0.0 dev eth0
 
 	yum -y install docker
-	sudo sed -i 's|OPTIONS=|OPTIONS=--registry-mirror=http://95728259.m.daocloud.io |g' /etc/sysconfig/docker
-	
+		
 	systemctl stop docker
 	systemctl daemon-reload	
 	systemctl start docker
@@ -30,15 +28,17 @@ install_docker(){
 
 download_archives(){
 	echo "starting download kubernetes..."
-	! test -d /opt/kubernetes* && rm -rf /opt/kubernetes*
-	wget ${BASE_DOWNLOAD_SERVER}/cloud_repository/kubernetes/server/kubernetes-server-linux-amd64.tar.gz -O /opt/kubernetes-server-linux-amd64.tar.gz
+
+	test -d /opt/kubernetes-minion && rm -rf /opt/kubernetes-minion
+
+	wget ${BASE_DOWNLOAD_SERVER}/archives/kubernetes/kubernetes-minion.tar.gz -O /opt/kubernetes-minion.tar.gz
 
 	cd /opt/
 
-	tar -vxzf kubernetes-server-linux-amd64.tar.gz
+	tar -vxzf kubernetes-minion.tar.gz
 
 	cd ../
-	rm -rf /opt/kubernetes-server-linux-amd64.tar.gz
+	rm -rf /opt/kubernetes-minion.tar.gz
 
 	echo "kubernetes download successfull!"
 }
@@ -53,7 +53,7 @@ install_kubelet(){
 	Requires=docker.service
 
 	[Service]
-	ExecStart=/opt/kubernetes/server/bin/kubelet \\
+	ExecStart=/opt/kubernetes-minion/kubelet \\
 	    --logtostderr=${KUBE_LOGTOSTDERR} \\
 	    --v=${KUBE_LOG_LEVEL} \\
 	    --api-servers=${KUBE_API_SERVERS} \\
@@ -85,11 +85,12 @@ install_kubeletProxy(){
 	After=network.target
 
 	[Service]
-	ExecStart=/opt/kubernetes/server/bin/kube-proxy \\
+	ExecStart=/opt/kubernetes-minion/kube-proxy \\
 	    --logtostderr=${KUBE_LOGTOSTDERR} \\
 	    --v=${KUBE_LOG_LEVEL} \\
-	    --bind_address=${KUBE_BIND_ADDRESS} \\
-	    --master=${KUBE_API_SERVERS} 
+	    --master=${KUBE_API_SERVERS} \\
+	    --bind_address=${KUBE_BIND_ADDRESS}
+	    
 	Restart=on-failure
 
 	[Install]
@@ -106,8 +107,15 @@ install_kubeletProxy(){
 
 applyIptablesRules(){
 	systemctl start iptables
+
+	iptables -I INPUT -p tcp --dport 4194 -j ACCEPT
+
+	iptables -I OUTPUT -p tcp --dport 4194 -j ACCEPT
+
 	iptables -I INPUT -p tcp --dport ${MINION_PORT} -j ACCEPT
+
 	iptables -I OUTPUT -p tcp --dport ${MINION_PORT} -j ACCEPT
+
 	iptables-save > /etc/sysconfig/iptables	
 	systemctl restart iptables
 
