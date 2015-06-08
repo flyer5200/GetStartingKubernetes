@@ -15,6 +15,6 @@ docker 版本 1.6.0
 * [基于Kubernetes构建Docker集群管理详解](http://www.csdn.net/article/2014-12-24/2823292-Docker-Kubernetes)
 * [kubernetes集群部署](http://blog.csdn.net/qingchi0/article/details/42538549)
 
-有问题,联系QQ: 359109055
+如有问题,联系QQ: 359109055
 
 
